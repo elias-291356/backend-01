@@ -2,7 +2,13 @@ import express from "express";
 
 import moviesController from "../../controllers/movies-controller.js";
 
-import { isEmptyBody } from "../../middlewares/index.js";
+import { isEmptyBody, isValidId } from "../../middlewares/index.js";
+
+import {
+  movieAddSchema,
+  movieUpdateSchema,
+  movieUpdateFavoriteSchema,
+} from "../../models/Movie.js";
 
 import { validateBody } from "../../decorators/index.js";
 
@@ -12,15 +18,28 @@ moviesRouter.get("/", moviesController.getAll);
 
 moviesRouter.get("/:id", moviesController.getById);
 
-moviesRouter.post("/", isEmptyBody, validateBody(), moviesController.add);
+moviesRouter.post(
+  "/",
+  isEmptyBody,
+  validateBody(movieAddSchema),
+  moviesController.add
+);
 
 moviesRouter.put(
   "/:id",
+  isValidId,
   isEmptyBody,
-  validateBody(),
+  validateBody(movieUpdateSchema),
   moviesController.updateById
 );
 
-moviesRouter.delete("/:id", moviesController.deleteById);
+moviesRouter.delete("/:id", isValidId, moviesController.deleteById);
+moviesRouter.patch(
+  "/:id/favorite",
+  isValidId,
+  isEmptyBody,
+  validateBody(movieUpdateFavoriteSchema),
+  moviesController.updateById
+);
 
 export default moviesRouter;
